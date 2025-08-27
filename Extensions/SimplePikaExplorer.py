@@ -18,7 +18,7 @@ try:
     from PySide6.QtWidgets import (
         QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
         QListWidget, QTableWidget, QTableWidgetItem, QLabel, QPushButton,
-        QComboBox, QMessageBox, QTextEdit, QSplitter
+        QComboBox, QMessageBox, QTextEdit, QSplitter, QAbstractItemView
     )
     from PySide6.QtCore import Qt, QThread, Signal
 except ImportError:
@@ -138,6 +138,13 @@ class SimplePikaExplorer(QMainWindow):
         self.setWindowTitle("🐭 Simple Pika Backup Explorer")
         self.setGeometry(100, 100, 1000, 700)
         
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                                  stop: 0 #B0E0E6, stop: 1 #87CEEB);
+            }
+        """)
+
         # Central widget
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
@@ -195,6 +202,7 @@ class SimplePikaExplorer(QMainWindow):
         self.file_table.setColumnCount(3)
         self.file_table.setHorizontalHeaderLabels(["Name", "Date", "Size"])
         self.file_table.itemDoubleClicked.connect(self.on_file_double_clicked)
+        self.file_table.setSelectionMode(QAbstractItemView.ExtendedSelection)
         right_layout.addWidget(self.file_table)
         
         # File actions
@@ -386,54 +394,63 @@ class SimplePikaExplorer(QMainWindow):
     def on_selection_changed(self):
         """Handle selection change"""
         selected = self.file_table.selectedItems()
-        has_file_selected = False
+        has_selection = len(selected) > 0
         
-        if selected:
-            file_info = selected[0].data(Qt.UserRole)
-            has_file_selected = not file_info['is_dir']
-        
-        self.temp_copy_btn.setEnabled(has_file_selected)
-        self.copy_btn.setEnabled(has_file_selected)
-    
-    def get_selected_file(self):
+        self.temp_copy_btn.setEnabled(has_selection)
+        self.copy_btn.setEnabled(has_selection)
+
+    def get_selected_items(self):
         """Get selected file info"""
-        selected = self.file_table.selectedItems()
-        if selected:
-            return selected[0].data(Qt.UserRole)
-        return None
-    
+        selected_items = []
+        selected_rows = set()
+        for item in self.file_table.selectedItems():
+            selected_rows.add(item.row())
+
+        for row in sorted(list(selected_rows)):
+            item = self.file_table.item(row, 0)
+            if item:
+                selected_items.append(item.data(Qt.UserRole))
+        return selected_items
+
     def temp_copy_selected(self):
-        """Copy selected file to temp"""
-        file_info = self.get_selected_file()
-        if file_info:
-            self.copy_file(file_info, self.temp_path, "Temp")
-    
+        """Copy selected items to temp"""
+        items = self.get_selected_items()
+        if items:
+            for item in items:
+                self.copy_item(item, self.temp_path, "Temp")
+            QMessageBox.information(self, "Success", f"Copied {len(items)} items to Temp folder.")
+
     def copy_selected(self):
-        """Copy selected file permanently"""
-        file_info = self.get_selected_file()
-        if file_info:
-            self.copy_file(file_info, self.recovery_path, "Recovery")
-    
-    def copy_file(self, file_info, dest_dir, dest_type):
-        """Copy file to destination"""
+        """Copy selected items permanently"""
+        items = self.get_selected_items()
+        if items:
+            for item in items:
+                self.copy_item(item, self.recovery_path, "Recovery")
+            QMessageBox.information(self, "Success", f"Copied {len(items)} items to Recovery folder.")
+
+    def copy_item(self, item_info, dest_dir, dest_type):
+        """Copy file or directory to destination"""
         try:
-            src_path = file_info['path']
-            filename = file_info['name']
-            dest_path = os.path.join(dest_dir, filename)
+            src_path = item_info['path']
+            item_name = item_info['name']
+            dest_path = os.path.join(dest_dir, item_name)
             
             # Handle duplicates
             counter = 1
+            base_name, ext = os.path.splitext(item_name)
             while os.path.exists(dest_path):
-                name, ext = os.path.splitext(filename)
-                dest_path = os.path.join(dest_dir, f"{name}_{counter}{ext}")
+                dest_path = os.path.join(dest_dir, f"{base_name}_{counter}{ext}")
                 counter += 1
             
-            shutil.copy2(src_path, dest_path)
-            QMessageBox.information(self, "Success", f"Copied to {dest_type} folder:\n{dest_path}")
-            self.status_label.setText(f"Copied {filename} to {dest_type}")
+            if item_info['is_dir']:
+                shutil.copytree(src_path, dest_path)
+            else:
+                shutil.copy2(src_path, dest_path)
+
+            self.status_label.setText(f"Copied {item_name} to {dest_type}")
         
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Copy failed: {e}")
+            QMessageBox.critical(self, "Error", f"Copy failed for {item_name}: {e}")
     
     def unmount_archive(self):
         """Unmount current archive"""
