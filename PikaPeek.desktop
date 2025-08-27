@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=PikaPeek Backup Explorer
+Comment=Borg Backup Repository Explorer and File Recovery Tool
+Exec=/home/herb/Desktop/PikaPeek/Scripts/Launchers/run-backup-explorer.sh
+Icon=/home/herb/Desktop/PikaPeek/Assets/pikapeek-icon.png
+Path=/home/herb/Desktop/PikaPeek
+Terminal=false
+StartupNotify=true
+Categories=Utility;System;Archiving;
+Keywords=backup;borg;explorer;recovery;archive;
+MimeType=application/x-borg-backup;
+StartupWMClass=PikaPeek Backup Explorer
