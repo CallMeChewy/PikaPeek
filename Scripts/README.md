@@ -1,6 +1,6 @@
 # PikaPeek Scripts
 
-This directory contains supporting scripts and utilities for the PikaPeek backup explorer project.
+This directory contains supporting scripts and utilities for the PikaPeek project.
 
 ## 📂 Directory Structure
 

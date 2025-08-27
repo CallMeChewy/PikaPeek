@@ -34,7 +34,7 @@ python3 setup.py install
 
 ## 📋 Purpose
 
-These utilities support the development and maintenance of the PikaPeek backup explorer project, providing tools for:
+These utilities support the development and maintenance of the PikaPeek project, providing tools for:
 - Code extraction and documentation processing
 - Project setup and configuration  
 - Testing and validation
