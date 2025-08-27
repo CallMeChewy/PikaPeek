@@ -143,8 +143,17 @@ class SimplePikaExplorer(QMainWindow):
                 background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                                   stop: 0 #B0E0E6, stop: 1 #87CEEB);
             }
-            * {
+            QLabel, QSplitter {
                 color: black;
+                background-color: transparent;
+            }
+            QComboBox, QPushButton, QListWidget, QTableWidget {
+                color: white;
+                background-color: #00008B; /* DarkBlue */
+            }
+            QHeaderView::section {
+                color: white;
+                background-color: #00008B;
             }
         """)
 
