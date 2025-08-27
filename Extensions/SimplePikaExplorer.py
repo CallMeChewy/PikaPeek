@@ -140,20 +140,37 @@ class SimplePikaExplorer(QMainWindow):
         
         self.setStyleSheet("""
             QMainWindow {
-                background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                                  stop: 0 #B0E0E6, stop: 1 #87CEEB);
+                background-color: #2E3440;
             }
             QLabel, QSplitter {
-                color: black;
+                color: #ECEFF4;
                 background-color: transparent;
             }
-            QComboBox, QPushButton, QListWidget, QTableWidget {
-                color: white;
-                background-color: #00008B; /* DarkBlue */
+            QComboBox, QPushButton {
+                color: #ECEFF4;
+                background-color: #3B4252;
+                border: 1px solid #4C566A;
+            }
+            QPushButton:hover {
+                background-color: #4C566A;
+            }
+            QPushButton:pressed {
+                background-color: #5E81AC;
+            }
+            QListWidget, QTableWidget {
+                color: #ECEFF4;
+                background-color: #3B4252;
+                border: 1px solid #4C566A;
             }
             QHeaderView::section {
-                color: white;
-                background-color: #00008B;
+                color: #ECEFF4;
+                background-color: #5E81AC;
+                padding: 4px;
+                border: 1px solid #4C566A;
+            }
+            QTableWidget::item:selected {
+                background-color: #88C0D0;
+                color: #2E3440;
             }
         """)
 
